@@ -779,7 +779,7 @@ Xget supports API acceleration for many mainstream AI inference providers, using
 
 > **AI request header sanitization**
 > - For AI routes (`/ip/...`), Xget strips client IP related headers before forwarding:
->   `x-forwarded-for`, `x-real-ip`, `forwarded`, `cf-connecting-ip`, `true-client-ip`, `x-client-ip`, `x-cluster-client-ip`, `fastly-client-ip`.
+>   `x-forwarded-for`, `x-forwarded-proto`, `x-forwarded-host`, `x-forwarded-port`, `x-forwarded-server`, `x-real-ip`, `forwarded`, `cf-connecting-ip`, `cf-ipcountry`, `cf-ray`, `cf-visitor`, `true-client-ip`, `x-client-ip`, `x-cluster-client-ip`, `fastly-client-ip`.
 > - `Authorization`, `Content-Type`, and other required AI protocol headers are still forwarded.
 > - This does **not** change the upstream-visible Xget egress IP and does not guarantee bypassing geo/region restrictions.
 

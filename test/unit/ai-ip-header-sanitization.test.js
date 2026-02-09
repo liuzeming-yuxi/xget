@@ -29,7 +29,7 @@ describe('AI IP Header Sanitization', () => {
     vi.restoreAllMocks();
   });
 
-  it('strips client IP related headers for AI requests', async () => {
+  it('strips client identity and geo headers for AI requests', async () => {
     const request = new Request('https://example.com/ip/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -39,10 +39,16 @@ describe('AI IP Header Sanitization', () => {
         'x-real-ip': '2.2.2.2',
         Forwarded: 'for=3.3.3.3',
         'CF-Connecting-IP': '4.4.4.4',
+        'CF-IPCountry': 'CN',
+        'CF-Ray': '9cb3bedb9e70b96f',
+        'CF-Visitor': '{"scheme":"https"}',
         'True-Client-IP': '5.5.5.5',
         'X-Client-IP': '6.6.6.6',
         'X-Cluster-Client-IP': '7.7.7.7',
-        'Fastly-Client-IP': '8.8.8.8'
+        'Fastly-Client-IP': '8.8.8.8',
+        'X-Forwarded-Proto': 'https',
+        'X-Forwarded-Host': 'xget.alphacat.site',
+        'X-Forwarded-Port': '443'
       },
       body: JSON.stringify({ model: 'gpt-5.1', input: 'hello' })
     });
@@ -58,10 +64,16 @@ describe('AI IP Header Sanitization', () => {
     expect(headers.has('x-real-ip')).toBe(false);
     expect(headers.has('forwarded')).toBe(false);
     expect(headers.has('cf-connecting-ip')).toBe(false);
+    expect(headers.has('cf-ipcountry')).toBe(false);
+    expect(headers.has('cf-ray')).toBe(false);
+    expect(headers.has('cf-visitor')).toBe(false);
     expect(headers.has('true-client-ip')).toBe(false);
     expect(headers.has('x-client-ip')).toBe(false);
     expect(headers.has('x-cluster-client-ip')).toBe(false);
     expect(headers.has('fastly-client-ip')).toBe(false);
+    expect(headers.has('x-forwarded-proto')).toBe(false);
+    expect(headers.has('x-forwarded-host')).toBe(false);
+    expect(headers.has('x-forwarded-port')).toBe(false);
   });
 
   it('preserves Authorization and Content-Type for AI requests', async () => {

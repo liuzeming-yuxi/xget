@@ -31,10 +31,17 @@ const AI_IP_RELATED_HEADERS = [
   'x-real-ip',
   'forwarded',
   'cf-connecting-ip',
+  'cf-ipcountry',
+  'cf-ray',
+  'cf-visitor',
   'true-client-ip',
   'x-client-ip',
   'x-cluster-client-ip',
-  'fastly-client-ip'
+  'fastly-client-ip',
+  'x-forwarded-proto',
+  'x-forwarded-host',
+  'x-forwarded-port',
+  'x-forwarded-server'
 ];
 
 /**
