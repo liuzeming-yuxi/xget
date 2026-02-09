@@ -777,6 +777,12 @@ For use cases, see [Container Image Acceleration](#container-image-acceleration)
 
 Xget supports API acceleration for many mainstream AI inference providers, using the `ip/[AI Provider Prefix]` format:
 
+> **AI request header sanitization**
+> - For AI routes (`/ip/...`), Xget strips client IP related headers before forwarding:
+>   `x-forwarded-for`, `x-real-ip`, `forwarded`, `cf-connecting-ip`, `true-client-ip`, `x-client-ip`, `x-cluster-client-ip`, `fastly-client-ip`.
+> - `Authorization`, `Content-Type`, and other required AI protocol headers are still forwarded.
+> - This does **not** change the upstream-visible Xget egress IP and does not guarantee bypassing geo/region restrictions.
+
 | AI Inference Provider | Provider Prefix | Original URL Format | Accelerated URL Format |
 |----------------------|-----------------|---------------------|------------------------|
 | OpenAI | `openai` | `https://api.openai.com/...` | `https://xget.xi-xu.me/ip/openai/...` |

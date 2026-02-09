@@ -24,6 +24,19 @@ import { PerformanceMonitor, addPerformanceHeaders } from './utils/performance.j
 import { addSecurityHeaders, createErrorResponse } from './utils/security.js';
 import { isDockerRequest, validateRequest } from './utils/validation.js';
 
+const PROXY_EXCLUDED_HEADERS = new Set(['host', 'connection', 'upgrade', 'proxy-connection']);
+
+const AI_IP_RELATED_HEADERS = [
+  'x-forwarded-for',
+  'x-real-ip',
+  'forwarded',
+  'cf-connecting-ip',
+  'true-client-ip',
+  'x-client-ip',
+  'x-cluster-client-ip',
+  'fastly-client-ip'
+];
+
 /**
  * Main request handler with comprehensive caching, retry logic, and security measures.
  * @param {Request} request - The incoming HTTP request
@@ -211,11 +224,7 @@ async function handleRequest(request, env, ctx) {
                     // This ensures protocol compliance
                     for (const [key, value] of request.headers.entries()) {
                       // Skip headers that might cause issues with proxying
-                      if (
-                        !['host', 'connection', 'upgrade', 'proxy-connection'].includes(
-                          key.toLowerCase()
-                        )
-                      ) {
+                      if (!PROXY_EXCLUDED_HEADERS.has(key.toLowerCase())) {
                         requestHeaders.set(key, value);
                       }
                     }
@@ -224,6 +233,10 @@ async function handleRequest(request, env, ctx) {
                     configureGitHeaders(requestHeaders, request, url, isGitLFS);
 
                     if (isAI) {
+                      // Remove client IP forwarding headers for AI inference requests.
+                      for (const headerName of AI_IP_RELATED_HEADERS) {
+                        requestHeaders.delete(headerName);
+                      }
                       configureAIHeaders(requestHeaders, request);
                     }
 
